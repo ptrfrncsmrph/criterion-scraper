@@ -8,24 +8,27 @@ import Data.Foldable (forM_, traverse_)
 import qualified Data.Text as T
 import Data.Text.Encoding (decodeUtf8)
 import qualified Data.Text.IO as T.IO
+import Database.SQLite.Simple
+import Database.SQLite.Simple.Types
 import Lib
 
 main :: IO ()
 main = do
+  conn <- createDatabase
   wat <- allMovies
   case wat of
-    -- Nothing -> T.IO.putStrLn "No Comments!"
     Nothing -> putStrLn "No Comments!"
     Just cs -> do
-      -- T.IO.putStrLn "Gonna print-a the lines!"
       putStrLn "Gonna print-a the lines!"
-      forM_ (processMovies cs) \Movie {..} ->
-        -- T.IO.putStrLn
-        T.IO.putStrLn
-          ( T.intercalate
-              "\t"
+      forM_ (processMovies cs) \Movie {..} -> do
+        execute conn insertMovie (Null, mvTitle, mvDirector, mvCountry, mvYear)
+        T.IO.putStrLn do
+          "Inserting: "
+            <> T.intercalate
+              ", "
               [ mvYear,
                 mvTitle,
-                mvDirector
+                mvDirector,
+                mvCountry
               ]
-          )
+  close conn

@@ -27,7 +27,7 @@ data Movie
   deriving (Show)
 
 instance ToRow Movie where
-  toRow Movie {..} = toRow (Null, mvTitle, mvDirector, mvCountry, mvYear)
+  toRow Movie {..} = toRow (mvTitle, mvDirector, mvCountry, mvYear)
 
 allMovies :: IO (Maybe [Movie])
 allMovies = scrapeURLWithConfig config "https://films.criterionchannel.com" movieRoot
@@ -36,7 +36,7 @@ allMovies = scrapeURLWithConfig config "https://films.criterionchannel.com" movi
     movieRoot :: Scraper Text [Movie]
     movieRoot = chroots "tr" movie
     processText :: Text -> Text
-    processText = T.dropAround \c -> getAny $ foldMap (\f -> Any (f c)) [(== '…'), isSpace]
+    processText = T.dropAround \c -> getAny $ foldMap (\f -> Any (f c)) [(== '…'), (== ','), isSpace]
     movie :: Scraper Text Movie
     movie = do
       t <- processText <$> text ("td" @: [hasClass "criterion-channel__td--title"])
@@ -59,6 +59,14 @@ processMovies =
 
 -- ************* Database stuff *************
 
+createDatabase :: IO Connection
+createDatabase = do
+  conn <- open "movies.db"
+  execute_ conn createMoviesTable
+  pure conn
+
+-- execute conn --insertUser --meRow
+
 createMoviesTable :: Query
 createMoviesTable =
   [r|
@@ -71,8 +79,10 @@ createMoviesTable =
     )
   |]
 
-createDatabase :: IO ()
-createDatabase = do
-  conn <- open "movies.db"
-  execute_ conn createMoviesTable
--- execute conn --insertUser --meRow
+insertMovie :: Query
+insertMovie =
+  "INSERT INTO movies VALUES (?, ?, ?, ?, ?)"
+
+getAllMovies :: Query
+getAllMovies =
+  "SELECT * from movies"
