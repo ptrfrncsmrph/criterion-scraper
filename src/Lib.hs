@@ -1,11 +1,12 @@
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Lib where
 
-import Control.Applicative
+import Configuration.Dotenv (defaultConfig, loadFile)
 import Data.Char
 import Data.List
 import Data.Monoid
@@ -14,6 +15,7 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import Database.SQLite.Simple
 import Database.SQLite.Simple.Types
+import GHC.Generics
 import Text.HTML.Scalpel
 import Text.RawString.QQ
 
@@ -36,7 +38,7 @@ allMovies = scrapeURLWithConfig config "https://films.criterionchannel.com" movi
     movieRoot :: Scraper Text [Movie]
     movieRoot = chroots "tr" movie
     processText :: Text -> Text
-    processText = T.dropAround \c -> getAny $ foldMap (\f -> Any (f c)) [(== '…'), (== ','), isSpace]
+    processText = T.dropAround ((== '…') ||| (== ',') ||| isSpace)
     movie :: Scraper Text Movie
     movie = do
       t <- processText <$> text ("td" @: [hasClass "criterion-channel__td--title"])
@@ -51,11 +53,10 @@ allMovies = scrapeURLWithConfig config "https://films.criterionchannel.com" movi
             mvYear = y
           }
 
-processMovies :: [Movie] -> [Movie]
-processMovies =
-  sortOn mvYear
+p ||| p' = (||) <$> p <*> p'
 
--- . filter \Movie {..} -> "United States" `T.isInfixOf` mvCountry
+processMovies :: [Movie] -> [Movie]
+processMovies = sortOn mvYear
 
 -- ************* Database stuff *************
 
@@ -64,8 +65,6 @@ createDatabase = do
   conn <- open "movies.db"
   execute_ conn createMoviesTable
   pure conn
-
--- execute conn --insertUser --meRow
 
 createMoviesTable :: Query
 createMoviesTable =
