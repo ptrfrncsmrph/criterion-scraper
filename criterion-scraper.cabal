@@ -4,16 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 32c51f92a03cdff683c2d5a0b0e9e7dd3fa63085c9131c2953e5f51d2137e97c
+-- hash: f7e1114cb93190c482a2fa90d8e60e913127cb8b4e51aabd3676bc231c848020
 
 name:           criterion-scraper
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/criterion-scraper#readme>
-homepage:       https://github.com/githubuser/criterion-scraper#readme
-bug-reports:    https://github.com/githubuser/criterion-scraper/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -21,17 +15,17 @@ extra-source-files:
     README.md
     ChangeLog.md
 
-source-repository head
-  type: git
-  location: https://github.com/githubuser/criterion-scraper
-
 library
   exposed-modules:
-      Lib
+      Scraper
+      Scraper.API
+      Scraper.Database
+      Scraper.Movie
   other-modules:
       Paths_criterion_scraper
   hs-source-dirs:
       src
+  default-extensions: BlockArguments LambdaCase OverloadedStrings
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -39,12 +33,11 @@ library
     , dotenv
     , lens
     , mtl
-    , network
+    , postgresql-simple
     , raw-strings-qq
     , scalpel
     , sqlite-simple
     , text
-    , wreq
   default-language: Haskell2010
 
 executable criterion-scraper-exe
@@ -53,6 +46,7 @@ executable criterion-scraper-exe
       Paths_criterion_scraper
   hs-source-dirs:
       app
+  default-extensions: BlockArguments LambdaCase OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -62,12 +56,11 @@ executable criterion-scraper-exe
     , dotenv
     , lens
     , mtl
-    , network
+    , postgresql-simple
     , raw-strings-qq
     , scalpel
     , sqlite-simple
     , text
-    , wreq
   default-language: Haskell2010
 
 test-suite criterion-scraper-test
@@ -77,6 +70,7 @@ test-suite criterion-scraper-test
       Paths_criterion_scraper
   hs-source-dirs:
       test
+  default-extensions: BlockArguments LambdaCase OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -86,10 +80,9 @@ test-suite criterion-scraper-test
     , dotenv
     , lens
     , mtl
-    , network
+    , postgresql-simple
     , raw-strings-qq
     , scalpel
     , sqlite-simple
     , text
-    , wreq
   default-language: Haskell2010
