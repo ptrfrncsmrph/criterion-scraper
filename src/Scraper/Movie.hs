@@ -7,14 +7,14 @@ where
 
 import Data.Text (Text)
 import Database.SQLite.Simple (ToRow (..))
+import Prelude
 
-data Movie
-  = Movie
-      { mvTitle :: Text,
-        mvDirector :: Text,
-        mvCountry :: Text,
-        mvYear :: Text
-      }
+data Movie = Movie
+  { mvTitle :: Text,
+    mvDirector :: Text,
+    mvCountry :: Text,
+    mvYear :: Text
+  }
   deriving (Show)
 
 instance ToRow Movie where

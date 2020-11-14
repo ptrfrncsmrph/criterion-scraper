@@ -20,7 +20,9 @@ dependencies:
 
 default-extensions:
   - BlockArguments
+  - FlexibleContexts
   - LambdaCase
+  - NoImplicitPrelude
   - OverloadedStrings
 
 library:

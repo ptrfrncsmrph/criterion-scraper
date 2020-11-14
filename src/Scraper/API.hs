@@ -6,42 +6,43 @@ module Scraper.API
   )
 where
 
-import Control.Monad.Except (ExceptT (ExceptT))
+import Control.Monad.Error.Class (MonadError (..), liftEither)
+import Control.Monad.IO.Class (MonadIO (..))
 import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Scraper (AppError (..), AppM)
+import Scraper (AppError (..))
 import Scraper.Movie (Movie (..))
-import Text.HTML.Scalpel ((@:), Config (..), Scraper)
+import Text.HTML.Scalpel (Config (..), Scraper, (@:))
 import qualified Text.HTML.Scalpel as Scalpel
+import Prelude hiding (log)
 
-scrapeAllMovies :: AppM [Movie]
+scrapeAllMovies :: (MonadError AppError m, MonadIO m) => m [Movie]
 scrapeAllMovies =
-  ExceptT
-    (note ScrapeError <$> Scalpel.scrapeURLWithConfig config "https://films.criterionchannel.com" movieRoot)
+  liftEither
+    =<< liftIO do
+      note ScrapeError
+        <$> Scalpel.scrapeURLWithConfig
+          config
+          "https://films.criterionchannel.com"
+          movieRoot
   where
     config =
       Config {decoder = Scalpel.utf8Decoder, manager = Nothing}
-    movieRoot :: Scraper Text [Movie]
     movieRoot =
       Scalpel.chroots "tr" movie
-    cleanupText :: Text -> Text
     cleanupText =
       Text.dropAround ((== '…') ||| (== ',') ||| Char.isSpace)
     movie :: Scraper Text Movie
     movie = do
       mvTitle <-
-        cleanupText
-          <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--title"])
+        cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--title"])
       mvDirector <-
-        cleanupText
-          <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--director"])
+        cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--director"])
       mvCountry <-
-        cleanupText
-          <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--country"])
+        cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--country"])
       mvYear <-
-        cleanupText
-          <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--year"])
+        cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--year"])
       pure
         Movie
           { mvTitle,

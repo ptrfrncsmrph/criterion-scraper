@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f7e1114cb93190c482a2fa90d8e60e913127cb8b4e51aabd3676bc231c848020
+-- hash: a2fc7b44f18779ed8ca333d79ba848031ba8ed59e3bd43ce00a246897488d921
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -25,7 +25,7 @@ library
       Paths_criterion_scraper
   hs-source-dirs:
       src
-  default-extensions: BlockArguments LambdaCase OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase NoImplicitPrelude OverloadedStrings
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -46,7 +46,7 @@ executable criterion-scraper-exe
       Paths_criterion_scraper
   hs-source-dirs:
       app
-  default-extensions: BlockArguments LambdaCase OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase NoImplicitPrelude OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -70,7 +70,7 @@ test-suite criterion-scraper-test
       Paths_criterion_scraper
   hs-source-dirs:
       test
-  default-extensions: BlockArguments LambdaCase OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase NoImplicitPrelude OverloadedStrings
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
