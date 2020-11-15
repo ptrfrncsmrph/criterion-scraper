@@ -11,6 +11,7 @@ import Control.Monad.IO.Class (MonadIO (..))
 import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Lib (note, (|||))
 import Scraper (AppError (..))
 import Scraper.Movie (Movie (..))
 import Text.HTML.Scalpel (Config (..), Scraper, (@:))
@@ -21,7 +22,7 @@ scrapeAllMovies :: (MonadError AppError m, MonadIO m) => m [Movie]
 scrapeAllMovies =
   liftEither
     =<< liftIO do
-      note ScrapeError
+      note (AppError "Error while scraping")
         <$> Scalpel.scrapeURLWithConfig
           config
           "https://films.criterionchannel.com"
@@ -50,10 +51,3 @@ scrapeAllMovies =
             mvCountry,
             mvYear
           }
-
-(|||) :: Applicative f => f Bool -> f Bool -> f Bool
-p ||| p' = (||) <$> p <*> p'
-
-note :: a -> Maybe b -> Either a b
-note _ (Just x) = Right x
-note e Nothing = Left e

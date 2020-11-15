@@ -28,17 +28,6 @@ default-extensions:
 library:
   source-dirs: src
 
-executables:
-  criterion-scraper-exe:
-    main: Main.hs
-    source-dirs: app
-    ghc-options:
-      - -threaded
-      - -rtsopts
-      - -with-rtsopts=-N
-    dependencies:
-      - criterion-scraper
-
 tests:
   criterion-scraper-test:
     main: Spec.hs

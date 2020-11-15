@@ -1,4 +1,5 @@
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
 
 module Scraper.Movie
   ( Movie (..),
@@ -6,7 +7,8 @@ module Scraper.Movie
 where
 
 import Data.Text (Text)
-import Database.SQLite.Simple (ToRow (..))
+import Database.PostgreSQL.Simple (ToRow)
+import GHC.Generics (Generic)
 import Prelude
 
 data Movie = Movie
@@ -15,7 +17,4 @@ data Movie = Movie
     mvCountry :: Text,
     mvYear :: Text
   }
-  deriving (Show)
-
-instance ToRow Movie where
-  toRow Movie {..} = toRow (mvTitle, mvDirector, mvCountry, mvYear)
+  deriving (Show, Generic, ToRow)

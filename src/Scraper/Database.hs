@@ -12,8 +12,8 @@ import Control.Monad.IO.Class (MonadIO)
 import qualified Data.Foldable as Foldable
 import qualified Data.List as List
 import qualified Data.Text as Text
-import Database.SQLite.Simple (Connection, Query)
-import Database.SQLite.Simple.Types (Null (..))
+import Database.PostgreSQL.Simple (Connection, Query)
+import Database.PostgreSQL.Simple.Types (Null (..))
 import Scraper (AppError, MonadDatabase (..), MonadLogger (..))
 import qualified Scraper.API as API
 import Scraper.Movie (Movie (..))
