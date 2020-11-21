@@ -1,4 +1,4 @@
-module Lib (note, (|||)) where
+module CriterionScraper.Lib (note, (|||)) where
 
 import Prelude
 

@@ -1,19 +1,19 @@
 {-# LANGUAGE ApplicativeDo #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Scraper.API
+module CriterionScraper.Scraper.API
   ( scrapeAllMovies,
   )
 where
 
 import Control.Monad.Error.Class (MonadError (..), liftEither)
 import Control.Monad.IO.Class (MonadIO (..))
+import CriterionScraper.Lib (note, (|||))
+import CriterionScraper.Scraper (AppError (..))
+import CriterionScraper.Scraper.Movie (Movie (..))
 import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Lib (note, (|||))
-import Scraper (AppError (..))
-import Scraper.Movie (Movie (..))
 import Text.HTML.Scalpel (Config (..), Scraper, (@:))
 import qualified Text.HTML.Scalpel as Scalpel
 import Prelude hiding (log)

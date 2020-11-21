@@ -1,7 +1,8 @@
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE TypeApplications #-}
 
-module Scraper.Database
+module CriterionScraper.Scraper.Database
   ( run,
     getAllMovies,
   )
@@ -9,20 +10,22 @@ where
 
 import Control.Monad.Error.Class (MonadError)
 import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Reader.Class (MonadReader, ask)
+import CriterionScraper.Scraper (AppError, MonadDatabase (..), MonadLogger (..))
+import qualified CriterionScraper.Scraper.API as API
+import CriterionScraper.Scraper.Movie (Movie (..))
 import qualified Data.Foldable as Foldable
 import qualified Data.List as List
 import qualified Data.Text as Text
-import Database.PostgreSQL.Simple (Connection, Query)
+import Database.PostgreSQL.Simple (ConnectInfo, Connection, Query)
 import Database.PostgreSQL.Simple.Types (Null (..))
-import Scraper (AppError, MonadDatabase (..), MonadLogger (..))
-import qualified Scraper.API as API
-import Scraper.Movie (Movie (..))
 import Text.RawString.QQ (r)
 import Prelude hiding (log)
 
-createDatabase :: MonadDatabase m => m Connection
+createDatabase :: (MonadError AppError m, MonadReader ConnectInfo m, MonadDatabase m) => m Connection
 createDatabase = do
-  conn <- open "movies.db"
+  connectInfo <- ask
+  conn <- open connectInfo
   execute_ conn createMoviesTable
   pure conn
 
@@ -30,23 +33,23 @@ createMoviesTable :: Query
 createMoviesTable =
   [r|
     CREATE TABLE IF NOT EXISTS movies
-    ( id INTEGER PRIMARY KEY AUTOINCREMENT,
-      title TEXT,
-      director TEXT,
-      country TEXT,
-      year TEXT
+    ( id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      director TEXT NOT NULL,
+      country TEXT NOT NULL,
+      year INT NOT NULL
     )
   |]
 
 insertMovie :: Query
 insertMovie =
-  "INSERT INTO movies VALUES (?, ?, ?, ?, ?)"
+  "INSERT INTO movies (title, director, country, year) VALUES (?, ?, ?, ?)"
 
 getAllMovies :: Query
 getAllMovies =
   "SELECT * from movies"
 
-run :: (MonadDatabase m, MonadIO m, MonadError AppError m, MonadLogger m) => m ()
+run :: (MonadDatabase m, MonadReader ConnectInfo m, MonadIO m, MonadError AppError m, MonadLogger m) => m ()
 run = do
   log "Creating database"
   conn <- createDatabase
@@ -59,6 +62,6 @@ run = do
       execute
         conn
         insertMovie
-        (Null, mvTitle, mvDirector, mvCountry, mvYear)
+        (mvTitle, mvDirector, mvCountry, read @Int (Text.unpack mvYear))
       log ("Inserting: " <> Text.intercalate ", " [mvYear, mvTitle, mvDirector, mvCountry])
   close conn

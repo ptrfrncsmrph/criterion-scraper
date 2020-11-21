@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module Scraper.Movie
+module CriterionScraper.Scraper.Movie
   ( Movie (..),
   )
 where

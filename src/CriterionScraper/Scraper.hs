@@ -3,7 +3,7 @@
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Scraper
+module CriterionScraper.Scraper
   ( AppM (..),
     AppError (..),
     MonadDatabase (..),
@@ -16,6 +16,8 @@ import Control.Exception (Exception)
 import Control.Monad.Except (ExceptT (..), MonadError (..), runExceptT)
 import Control.Monad.IO.Class (MonadIO (..))
 import Control.Monad.Reader (ReaderT (..))
+import Control.Monad.Reader.Class (MonadReader)
+import CriterionScraper.Lib (note)
 import Data.ByteString (ByteString)
 import Data.Function ((&))
 import Data.Int (Int64)
@@ -23,7 +25,6 @@ import Data.Text (Text)
 import qualified Data.Text.IO as Text.IO
 import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query, ToRow)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
-import Lib (note)
 import Text.Read (readMaybe)
 import Prelude
 
@@ -32,7 +33,8 @@ newtype AppM a = AppM {runAppM :: ReaderT ConnectInfo (ExceptT AppError IO) a}
     ( Functor,
       Applicative,
       Monad,
-      MonadIO
+      MonadIO,
+      MonadReader ConnectInfo
     )
 
 -- @TODO: Use typed errors
@@ -45,13 +47,13 @@ class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
   close :: Connection -> m ()
-  open :: ByteString -> m Connection
+  open :: ConnectInfo -> m Connection
 
 instance MonadDatabase AppM where
   execute = (fmap . fmap) liftIO . PostgreSQL.Simple.execute
   execute_ = fmap liftIO . PostgreSQL.Simple.execute_
   close = liftIO . PostgreSQL.Simple.close
-  open = liftIO . PostgreSQL.Simple.connectPostgreSQL
+  open = liftIO . PostgreSQL.Simple.connect
 
 instance MonadError AppError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left
