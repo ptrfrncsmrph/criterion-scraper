@@ -56,13 +56,11 @@ class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
   close :: Connection -> m ()
-  open :: ConnectInfo -> m Connection
 
 instance MonadDatabase AppM where
   execute = (fmap . fmap) liftIO . PostgreSQL.Simple.execute
   execute_ = fmap liftIO . PostgreSQL.Simple.execute_
   close = liftIO . PostgreSQL.Simple.close
-  open = liftIO . PostgreSQL.Simple.connect
 
 instance MonadError AppError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left
