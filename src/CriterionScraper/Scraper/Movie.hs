@@ -7,7 +7,7 @@ module CriterionScraper.Scraper.Movie
 where
 
 import Data.Text (Text)
-import Database.PostgreSQL.Simple (ToRow)
+import Database.PostgreSQL.Simple (FromRow, ToRow)
 import GHC.Generics (Generic)
 import Prelude
 
@@ -17,4 +17,4 @@ data Movie = Movie
     mvCountry :: Text,
     mvYear :: Text
   }
-  deriving (Show, Generic, ToRow)
+  deriving (Show, Generic, ToRow, FromRow)

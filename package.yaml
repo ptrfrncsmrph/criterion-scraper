@@ -15,14 +15,15 @@ dependencies:
   - postgresql-simple
   - raw-strings-qq
   - scalpel
-  - sqlite-simple # TODO: Delete
   - text
 
 default-extensions:
   - BlockArguments
   - FlexibleContexts
   - LambdaCase
+  - NamedFieldPuns
   - NoImplicitPrelude
+  - RecordWildCards
   - OverloadedStrings
 
 library:

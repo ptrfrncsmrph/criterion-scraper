@@ -4,8 +4,10 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
 module CriterionScraper.Scraper
-  ( AppM (..),
+  ( AppConfig (..),
+    AppEnvironment (..),
     AppError (..),
+    AppM (..),
     MonadDatabase (..),
     MonadLogger (..),
     parseEnv,
@@ -28,14 +30,21 @@ import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Text.Read (readMaybe)
 import Prelude
 
-newtype AppM a = AppM {runAppM :: ReaderT ConnectInfo (ExceptT AppError IO) a}
+newtype AppM a = AppM {runAppM :: ReaderT AppConfig (ExceptT AppError IO) a}
   deriving
     ( Functor,
       Applicative,
       Monad,
       MonadIO,
-      MonadReader ConnectInfo
+      MonadReader AppConfig
     )
+
+data AppConfig = AppConfig
+  { environment :: AppEnvironment,
+    connection :: Connection
+  }
+
+data AppEnvironment = Production | Development
 
 -- @TODO: Use typed errors
 newtype AppError = AppError String
