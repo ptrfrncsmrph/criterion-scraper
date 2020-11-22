@@ -38,25 +38,23 @@ createDatabase = do
 
 createMoviesTable :: Query
 createMoviesTable =
-  mconcat
-    [ [r|CREATE TABLE IF NOT EXISTS |] <> moviesTable,
-      [r| 
+  [r|CREATE TABLE IF NOT EXISTS |] <> moviesTable
+    <> [r| 
     ( id SERIAL PRIMARY KEY,
       title TEXT NOT NULL,
       director TEXT NOT NULL,
       country TEXT NOT NULL,
-      year INT NOT NULL
-    );|],
-      [r|ALTER TABLE |] <> moviesTable <> [r| DROP CONSTRAINT IF EXISTS |] <> constraint <> [r|;|],
-      [r|ALTER TABLE |] <> moviesTable <> [r| ADD CONSTRAINT |] <> constraint <> [r| UNIQUE (title, director, year);|]
-    ]
+      year INT NOT NULL,
+      CONSTRAINT |]
+    <> constraint
+    <> [r| UNIQUE (title, director, year)
+    ); 
+  |]
 
 insertMovie :: Query
 insertMovie =
-  [r|INSERT INTO |]
-    <> moviesTable
-    <> [r|
-    (title, director, country, year) VALUES (?, ?, ?, ?)
+  [r|INSERT INTO |] <> moviesTable
+    <> [r| (title, director, country, year) VALUES (?, ?, ?, ?)
     ON CONFLICT ON CONSTRAINT |]
     <> constraint
     <> [r| DO NOTHING |]
