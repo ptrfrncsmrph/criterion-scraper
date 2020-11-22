@@ -21,8 +21,10 @@ default-extensions:
   - BlockArguments
   - FlexibleContexts
   - LambdaCase
+  - MultiParamTypeClasses
   - NamedFieldPuns
   - NoImplicitPrelude
+  - RankNTypes
   - RecordWildCards
   - OverloadedStrings
 
