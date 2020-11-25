@@ -16,6 +16,8 @@ dependencies:
   - raw-strings-qq
   - scalpel
   - text
+  - time
+  - uuid
 
 default-extensions:
   - BlockArguments
@@ -24,9 +26,10 @@ default-extensions:
   - MultiParamTypeClasses
   - NamedFieldPuns
   - NoImplicitPrelude
+  - OverloadedStrings
   - RankNTypes
   - RecordWildCards
-  - OverloadedStrings
+  - ScopedTypeVariables
 
 library:
   source-dirs: src

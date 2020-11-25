@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fefde47f3a25b12118d779ca1abaa8fc16c39e58f749973ca34e212994195ae9
+-- hash: 25c6b2e0ec10efeac9ae6a6bd3cb0c9ecf59d3c5d31e849acdf796bf7b21a68c
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -28,7 +28,7 @@ library
       Paths_criterion_scraper
   hs-source-dirs:
       src
-  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude RankNTypes RecordWildCards OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables
   build-depends:
       aeson
     , base >=4.7 && <5
@@ -40,6 +40,8 @@ library
     , raw-strings-qq
     , scalpel
     , text
+    , time
+    , uuid
   default-language: Haskell2010
 
 executable criterion-scraper
@@ -48,7 +50,7 @@ executable criterion-scraper
       Paths_criterion_scraper
   hs-source-dirs:
       ./app
-  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude RankNTypes RecordWildCards OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables
   ghc-options: -threaded -O "-with-rtsopts=-N"
   build-depends:
       aeson
@@ -62,6 +64,8 @@ executable criterion-scraper
     , raw-strings-qq
     , scalpel
     , text
+    , time
+    , uuid
   default-language: Haskell2010
 
 test-suite criterion-scraper-test
@@ -71,7 +75,7 @@ test-suite criterion-scraper-test
       Paths_criterion_scraper
   hs-source-dirs:
       test
-  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude RankNTypes RecordWildCards OverloadedStrings
+  default-extensions: BlockArguments FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
@@ -85,4 +89,6 @@ test-suite criterion-scraper-test
     , raw-strings-qq
     , scalpel
     , text
+    , time
+    , uuid
   default-language: Haskell2010

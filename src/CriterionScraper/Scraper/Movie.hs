@@ -12,9 +12,9 @@ import GHC.Generics (Generic)
 import Prelude
 
 data Movie = Movie
-  { mvTitle :: Text,
-    mvDirector :: Text,
-    mvCountry :: Text,
-    mvYear :: Text
+  { title :: Text,
+    director :: Text,
+    country :: Text,
+    year :: Int
   }
   deriving (Show, Generic, ToRow, FromRow)

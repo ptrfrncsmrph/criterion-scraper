@@ -25,8 +25,15 @@ import Data.Function ((&))
 import Data.Int (Int64)
 import Data.Text (Text)
 import qualified Data.Text.IO as Text.IO
-import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query, ToRow)
+import Database.PostgreSQL.Simple
+  ( ConnectInfo (..),
+    Connection,
+    FromRow,
+    Query,
+    ToRow,
+  )
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
+import Database.PostgreSQL.Simple.FromRow (RowParser)
 import Text.Read (readMaybe)
 import Prelude
 
@@ -53,11 +60,15 @@ newtype AppError = AppError String
 instance Exception AppError
 
 class MonadIO m => MonadDatabase m where
+  returning :: (ToRow q, FromRow r) => Connection -> Query -> [q] -> m [r]
+  returningWith :: (ToRow q) => RowParser r -> Connection -> Query -> [q] -> m [r]
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
   close :: Connection -> m ()
 
 instance MonadDatabase AppM where
+  returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
+  returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
   execute = (fmap . fmap) liftIO . PostgreSQL.Simple.execute
   execute_ = fmap liftIO . PostgreSQL.Simple.execute_
   close = liftIO . PostgreSQL.Simple.close

@@ -1,4 +1,5 @@
 {-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE TypeApplications #-}
 
 module CriterionScraper.Scraper.API
   ( scrapeAllMovies,
@@ -35,18 +36,19 @@ scrapeAllMovies =
       Text.dropAround ((== '…') ||| (== ',') ||| Char.isSpace)
     movie :: Scraper Text Movie
     movie = do
-      mvTitle <-
+      title <-
         cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--title"])
-      mvDirector <-
+      director <-
         cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--director"])
-      mvCountry <-
+      country <-
         cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--country"])
-      mvYear <-
-        cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--year"])
+      year <-
+        read @Int . Text.unpack . cleanupText
+          <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--year"])
       pure
         Movie
-          { mvTitle,
-            mvDirector,
-            mvCountry,
-            mvYear
+          { title,
+            director,
+            country,
+            year
           }
