@@ -34,7 +34,7 @@ import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (FromRow (..), RowParser)
 import Database.PostgreSQL.Simple.SqlQQ (sql)
-import Database.PostgreSQL.Simple.Types (Null (..))
+import Database.PostgreSQL.Simple.Types (Null (..), Only (..))
 import GHC.Generics (Generic)
 import qualified System.Environment as Environment
 import Text.RawString.QQ (r)
@@ -90,7 +90,7 @@ insertMovie =
     <> [r|
     DO UPDATE
     SET modified = EXCLUDED.modified
-    RETURNING *|]
+    RETURNING *, (xmax = 0) AS inserted|]
 
 getAllMovies :: Query
 getAllMovies =
@@ -105,8 +105,9 @@ runScraper = do
   (movies :: [Scraper.Movie.Movie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies
   log "Success"
   conn <- asks connection
-  (xs :: [Movie]) <-
-    returning
+  (xs :: [(Movie, Only Bool)]) <-
+    returningWith
+      ((,) <$> fromRow @Movie <*> fromRow @(Only Bool))
       conn
       insertMovie
       (movies <&> \Scraper.Movie.Movie {..} -> (title, director, country, year))
