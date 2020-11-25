@@ -75,14 +75,15 @@ instance MonadDatabase AppM where
 
 instance MonadError AppError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left
-  catchError (AppM (ReaderT f)) handler = AppM $
+  catchError (AppM (ReaderT f)) handler = AppM do
     ReaderT \conn ->
-      ExceptT $
-        runExceptT (f conn) >>= \case
-          Left x ->
-            let f' = runReaderT (runAppM (handler x))
-             in runExceptT (f' conn)
-          Right x -> pure (Right x)
+      ExceptT
+        ( runExceptT (f conn) >>= \case
+            Left x ->
+              let f' = runReaderT (runAppM (handler x))
+               in runExceptT (f' conn)
+            Right x -> pure (Right x)
+        )
 
 class MonadIO m => MonadLogger m where
   log :: Text -> m ()

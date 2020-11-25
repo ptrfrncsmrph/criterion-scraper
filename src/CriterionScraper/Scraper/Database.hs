@@ -7,6 +7,7 @@ module CriterionScraper.Scraper.Database
   ( runScraper,
     getAllMovies,
     createDatabase,
+    Movie (..),
   )
 where
 
@@ -33,12 +34,9 @@ import Data.UUID (UUID)
 import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (FromRow (..), RowParser)
-import Database.PostgreSQL.Simple.SqlQQ (sql)
 import Database.PostgreSQL.Simple.Types (Null (..), Only (..))
 import GHC.Generics (Generic)
-import qualified System.Environment as Environment
 import Text.RawString.QQ (r)
-import Unsafe.Coerce (unsafeCoerce)
 import Prelude hiding (log)
 
 data Movie = Movie

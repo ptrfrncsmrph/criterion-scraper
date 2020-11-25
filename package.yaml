@@ -11,16 +11,22 @@ dependencies:
   - bytestring
   - dotenv
   - lens
+  - http-client
   - mtl
   - postgresql-simple
   - raw-strings-qq
+  - resource-pool
   - scalpel
+  - servant
+  - servant-server
   - text
   - time
   - uuid
+  - warp
 
 default-extensions:
   - BlockArguments
+  - DataKinds
   - FlexibleContexts
   - LambdaCase
   - MultiParamTypeClasses
@@ -30,6 +36,7 @@ default-extensions:
   - RankNTypes
   - RecordWildCards
   - ScopedTypeVariables
+  - TypeOperators
 
 library:
   source-dirs: src
