@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4007b88302416c5a8d8c59ebdb77bd9eec6c10d39b318b296a23d75363633538
+-- hash: 5a4109ee1b82e51c87517c96ac0a365f078636c60e7b865d6af9fb9111741d51
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -18,8 +18,8 @@ extra-source-files:
 library
   exposed-modules:
       CriterionScraper.API
-      CriterionScraper.Lib
       CriterionScraper.Main
+      CriterionScraper.Prelude
       CriterionScraper.Scraper
       CriterionScraper.Scraper.API
       CriterionScraper.Scraper.Database
@@ -33,7 +33,10 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
+    , deepseq
     , dotenv
+    , hashable
     , http-client
     , lens
     , mtl
@@ -43,8 +46,11 @@ library
     , scalpel
     , servant
     , servant-server
+    , stm
     , text
     , time
+    , transformers
+    , unordered-containers
     , uuid
     , warp
   default-language: Haskell2010
@@ -61,8 +67,11 @@ executable criterion-scraper
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , criterion-scraper
+    , deepseq
     , dotenv
+    , hashable
     , http-client
     , lens
     , mtl
@@ -72,8 +81,11 @@ executable criterion-scraper
     , scalpel
     , servant
     , servant-server
+    , stm
     , text
     , time
+    , transformers
+    , unordered-containers
     , uuid
     , warp
   default-language: Haskell2010
@@ -91,8 +103,11 @@ test-suite criterion-scraper-test
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , criterion-scraper
+    , deepseq
     , dotenv
+    , hashable
     , http-client
     , lens
     , mtl
@@ -102,8 +117,11 @@ test-suite criterion-scraper-test
     , scalpel
     , servant
     , servant-server
+    , stm
     , text
     , time
+    , transformers
+    , unordered-containers
     , uuid
     , warp
   default-language: Haskell2010

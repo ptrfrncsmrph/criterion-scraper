@@ -6,10 +6,9 @@ module CriterionScraper.Scraper.Movie
   )
 where
 
+import CriterionScraper.Prelude
 import Data.Text (Text)
 import Database.PostgreSQL.Simple (FromRow, ToRow)
-import GHC.Generics (Generic)
-import Prelude
 
 data Movie = Movie
   { title :: Text,

@@ -1,14 +1,11 @@
 {-# LANGUAGE ApplicativeDo #-}
-{-# LANGUAGE TypeApplications #-}
 
 module CriterionScraper.Scraper.API
   ( scrapeAllMovies,
   )
 where
 
-import Control.Monad.Error.Class (MonadError (..), liftEither)
-import Control.Monad.IO.Class (MonadIO (..))
-import CriterionScraper.Lib (note, (|||))
+import CriterionScraper.Prelude
 import CriterionScraper.Scraper (AppError (..))
 import CriterionScraper.Scraper.Movie (Movie (..))
 import qualified Data.Char as Char
@@ -16,7 +13,6 @@ import Data.Text (Text)
 import qualified Data.Text as Text
 import Text.HTML.Scalpel (Config (..), Scraper, (@:))
 import qualified Text.HTML.Scalpel as Scalpel
-import Prelude hiding (log)
 
 scrapeAllMovies :: (MonadError AppError m, MonadIO m) => m [Movie]
 scrapeAllMovies =
@@ -34,6 +30,7 @@ scrapeAllMovies =
       Scalpel.chroots "tr" movie
     cleanupText =
       Text.dropAround ((== '…') ||| (== ',') ||| Char.isSpace)
+    (|||) = liftA2 (||)
     movie :: Scraper Text Movie
     movie = do
       title <-
@@ -43,7 +40,7 @@ scrapeAllMovies =
       country <-
         cleanupText <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--country"])
       year <-
-        read @Int . Text.unpack . cleanupText
+        unsafeRead . Text.unpack . cleanupText
           <$> Scalpel.text ("td" @: [Scalpel.hasClass "criterion-channel__td--year"])
       pure
         Movie

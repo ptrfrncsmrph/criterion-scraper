@@ -9,8 +9,11 @@ dependencies:
   - base >= 4.7 && < 5
   - aeson
   - bytestring
+  - containers
+  - deepseq
   - dotenv
   - lens
+  - hashable
   - http-client
   - mtl
   - postgresql-simple
@@ -19,8 +22,11 @@ dependencies:
   - scalpel
   - servant
   - servant-server
+  - stm
   - text
   - time
+  - transformers
+  - unordered-containers
   - uuid
   - warp
 

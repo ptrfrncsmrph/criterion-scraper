@@ -11,33 +11,22 @@ module CriterionScraper.Scraper.Database
   )
 where
 
-import Control.Monad.Error.Class (MonadError)
-import Control.Monad.IO.Class (MonadIO, liftIO)
-import Control.Monad.Reader.Class (MonadReader, ask, asks)
+import CriterionScraper.Prelude
 import CriterionScraper.Scraper
   ( AppConfig (..),
     AppError,
     MonadDatabase (..),
-    MonadLogger (..),
   )
 import qualified CriterionScraper.Scraper.API as API
 import qualified CriterionScraper.Scraper.Movie as Scraper.Movie
-import qualified Data.Foldable as Foldable
-import Data.Functor ((<&>))
-import Data.Int (Int64)
 import qualified Data.List as List
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
-import qualified Data.Text as Text
 import Data.Time.Clock (UTCTime)
 import Data.UUID (UUID)
 import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (FromRow (..), RowParser)
 import Database.PostgreSQL.Simple.Types (Null (..), Only (..))
-import GHC.Generics (Generic)
 import Text.RawString.QQ (r)
-import Prelude hiding (log)
 
 data Movie = Movie
   { movieId :: UUID,
@@ -94,14 +83,14 @@ getAllMovies :: Query
 getAllMovies =
   "SELECT * from " <> moviesTable
 
-runScraper :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError AppError m, MonadLogger m) => m ()
+runScraper :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError AppError m) => m ()
 runScraper = do
-  log "Creating database"
+  putStrLn "Creating database"
   _n <- createDatabase
-  log "Scraping movies"
+  putStrLn "Scraping movies"
   -- @TODO - Pete Murphy 2020-11-24 - Better way of doing this
   (movies :: [Scraper.Movie.Movie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies
-  log "Success"
+  putStrLn "Success"
   conn <- asks connection
   (xs :: [(Movie, Only Bool)]) <-
     returningWith
@@ -109,4 +98,4 @@ runScraper = do
       conn
       insertMovie
       (movies <&> \Scraper.Movie.Movie {..} -> (title, director, country, year))
-  log (Text.pack (show xs))
+  putStrLn (show xs)

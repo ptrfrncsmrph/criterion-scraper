@@ -6,33 +6,30 @@ import Configuration.Dotenv
     onMissingFile,
   )
 import qualified Control.Exception as Exception
-import Control.Monad.Except
-  ( liftEither,
-    runExceptT,
-    throwError,
-  )
-import Control.Monad.IO.Class (MonadIO (liftIO))
-import Control.Monad.Reader (ReaderT (..))
+import CriterionScraper.Prelude
 import CriterionScraper.Scraper
   ( AppConfig (..),
     AppEnvironment (..),
     AppError (..),
+    AppM (..),
   )
 import qualified CriterionScraper.Scraper as Scraper
 import CriterionScraper.Scraper.Database (runScraper)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
-import Prelude
 
 main :: IO ()
 main =
   runExceptT do
-    env <-
+    connectionInfo <-
       liftEither . Scraper.parseEnv
         =<< loadFile defaultConfig `onMissingFile` throwError (AppError "Failed to load .env")
     liftIO do
       Exception.bracket
-        (PostgreSQL.Simple.connect env)
+        (PostgreSQL.Simple.connect connectionInfo)
         (PostgreSQL.Simple.close)
         \connection -> runExceptT do
-          runReaderT (Scraper.runAppM runScraper) (AppConfig {connection, environment = Development})
+          runReaderT (runAppM app) (AppConfig {connection, environment = Development})
     >>= either print mempty
+
+app :: AppM ()
+app = error "unimplemented"
