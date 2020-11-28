@@ -16,7 +16,6 @@ where
 import CriterionScraper.Prelude
 import CriterionScraper.Scraper
   ( AppConfig (..),
-    AppError,
     MonadDatabase (..),
   )
 import qualified CriterionScraper.Scraper.API as API
@@ -28,6 +27,7 @@ import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (FromRow (..), RowParser)
 import Database.PostgreSQL.Simple.Types (Null (..), Only (..))
+import Servant (ServerError)
 import Text.RawString.QQ (r)
 
 data Movie = Movie
@@ -59,7 +59,7 @@ moviesTable = "movies"
 constraint :: Query
 constraint = moviesTable <> "_title_director_year"
 
-createDatabase :: (MonadReader AppConfig m, MonadError AppError m, MonadDatabase m) => m Int64
+createDatabase :: (MonadReader AppConfig m, MonadDatabase m) => m Int64
 createDatabase = do
   conn <- asks connection
   execute_ conn createMoviesTable
@@ -101,7 +101,7 @@ allMovies = do
     conn
     ("SELECT * from " <> moviesTable)
 
-scrape :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError AppError m) => m [Movie']
+scrape :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError ServerError m) => m [Movie']
 scrape = do
   putStrLn "Creating database"
   _n <- createDatabase

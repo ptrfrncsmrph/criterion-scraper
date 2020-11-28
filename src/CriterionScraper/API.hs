@@ -1,9 +1,14 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
-module CriterionScraper.API where
+module CriterionScraper.API
+  ( API,
+    api,
+  )
+where
 
 import CriterionScraper.Prelude
+import CriterionScraper.Scraper
 import CriterionScraper.Scraper.Database
   ( Movie (..),
     Movie' (..),
@@ -23,7 +28,5 @@ type API =
 api :: Proxy API
 api = Proxy
 
--- server :: Server API
--- server = (toHandler allMovies) :<|> (toHandler scrape)
-
-toHandler = error ""
+-- app :: (MonadDatabase m, MonadReader AppConfig m, MonadError ServerError m) => m API
+-- app = allMovies :<|> scrape

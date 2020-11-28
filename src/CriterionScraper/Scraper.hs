@@ -6,7 +6,6 @@
 module CriterionScraper.Scraper
   ( AppConfig (..),
     AppEnvironment (..),
-    AppError (..),
     AppM (..),
     MonadDatabase (..),
     parseEnv,
@@ -14,6 +13,7 @@ module CriterionScraper.Scraper
 where
 
 import CriterionScraper.Prelude
+import qualified Data.ByteString.Lazy as ByteString
 import qualified Data.List as List
 import Data.Text (Text)
 import qualified Data.Text.IO as Text.IO
@@ -26,8 +26,9 @@ import Database.PostgreSQL.Simple
   )
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (RowParser)
+import Servant (Handler (..), ServerError (..), err500, runHandler)
 
-newtype AppM a = AppM {runAppM :: ReaderT AppConfig (ExceptT AppError IO) a}
+newtype AppM a = AppM {runAppM :: ReaderT AppConfig (ExceptT ServerError IO) a}
   deriving
     ( Functor,
       Applicative,
@@ -44,10 +45,10 @@ data AppConfig = AppConfig
 data AppEnvironment = Production | Development
 
 -- @TODO: Use typed errors
-newtype AppError = AppError String
-  deriving (Show)
+-- newtype AppError = AppError String
+--   deriving (Show)
 
-instance Exception AppError
+-- instance Exception AppError
 
 class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
@@ -65,7 +66,20 @@ instance MonadDatabase AppM where
   returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
   returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
 
-instance MonadError AppError AppM where
+class MonadHandler m where
+  fromHandler :: Handler a -> m a
+
+-- @TODO - Pete Murphy 2020-11-28 - How do
+-- instance MonadHandler AppM where
+--   fromHandler =
+--     AppM
+--       . ReaderT
+--       . pure
+--       . ExceptT
+--       . fmap (mapLeft (\(ServerError {..}) -> AppError "ServerError"))
+--       . runHandler
+
+instance MonadError ServerError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left
   catchError (AppM (ReaderT f)) handler = AppM do
     ReaderT \conn ->
@@ -77,7 +91,7 @@ instance MonadError AppError AppM where
             Right x -> pure (Right x)
         )
 
-parseEnv :: [(String, String)] -> Either AppError ConnectInfo
+parseEnv :: [(String, String)] -> Either ServerError ConnectInfo
 parseEnv env = do
   connectHost <-
     List.lookup "CONNECT_HOST" env
@@ -106,4 +120,4 @@ parseEnv env = do
         connectDatabase
       }
   where
-    noteAppError = note . AppError
+    noteAppError errReasonPhrase = note (err500 {errReasonPhrase})

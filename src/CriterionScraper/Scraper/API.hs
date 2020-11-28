@@ -6,19 +6,20 @@ module CriterionScraper.Scraper.API
 where
 
 import CriterionScraper.Prelude
-import CriterionScraper.Scraper (AppError (..))
+-- import CriterionScraper.Scraper (AppError (..))
 import CriterionScraper.Scraper.Movie (Movie (..))
 import qualified Data.Char as Char
 import Data.Text (Text)
 import qualified Data.Text as Text
+import Servant (ServerError (..), err500)
 import Text.HTML.Scalpel (Config (..), Scraper, (@:))
 import qualified Text.HTML.Scalpel as Scalpel
 
-scrapeAllMovies :: (MonadError AppError m, MonadIO m) => m [Movie]
+scrapeAllMovies :: (MonadError ServerError m, MonadIO m) => m [Movie]
 scrapeAllMovies =
   liftEither
     =<< liftIO do
-      note (AppError "Error while scraping")
+      note (err500 {errBody = "Error while scraping"})
         <$> Scalpel.scrapeURLWithConfig
           config
           "https://films.criterionchannel.com"
