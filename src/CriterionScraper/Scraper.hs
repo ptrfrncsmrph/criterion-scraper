@@ -64,14 +64,12 @@ class MonadIO m => MonadDatabase m where
   returningWith :: (ToRow q) => RowParser r -> Connection -> Query -> [q] -> m [r]
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
-  close :: Connection -> m ()
 
 instance MonadDatabase AppM where
   returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
   returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
   execute = (fmap . fmap) liftIO . PostgreSQL.Simple.execute
   execute_ = fmap liftIO . PostgreSQL.Simple.execute_
-  close = liftIO . PostgreSQL.Simple.close
 
 instance MonadError AppError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left

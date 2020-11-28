@@ -110,4 +110,3 @@ runScraper = do
       insertMovie
       (movies <&> \Scraper.Movie.Movie {..} -> (title, director, country, year))
   log (Text.pack (show xs))
-  close conn

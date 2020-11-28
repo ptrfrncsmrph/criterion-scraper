@@ -1,11 +1,11 @@
-module CriterionScraper.Main where
+module CriterionScraper.Main (main) where
 
 import Configuration.Dotenv
   ( defaultConfig,
     loadFile,
     onMissingFile,
   )
-import Control.Applicative (Applicative (liftA2))
+import qualified Control.Exception as Exception
 import Control.Monad.Except
   ( liftEither,
     runExceptT,
@@ -26,7 +26,13 @@ import Prelude
 main :: IO ()
 main =
   runExceptT do
-    env <- loadFile defaultConfig `onMissingFile` throwError (AppError "Failed to load .env")
-    connection <- liftIO . PostgreSQL.Simple.connect =<< liftEither (Scraper.parseEnv env)
-    runReaderT (Scraper.runAppM runScraper) (AppConfig {connection, environment = Development})
+    env <-
+      liftEither . Scraper.parseEnv
+        =<< loadFile defaultConfig `onMissingFile` throwError (AppError "Failed to load .env")
+    liftIO do
+      Exception.bracket
+        (PostgreSQL.Simple.connect env)
+        (PostgreSQL.Simple.close)
+        \connection -> runExceptT do
+          runReaderT (Scraper.runAppM runScraper) (AppConfig {connection, environment = Development})
     >>= either print mempty
