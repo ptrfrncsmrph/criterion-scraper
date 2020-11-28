@@ -1,41 +1,13 @@
-{-# LANGUAGE AllowAmbiguousTypes #-}
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 module CriterionScraper.Prelude
   ( andM,
     error,
     fail,
-    foldl,
-    foldr1,
-    foldr1May,
-    forM,
-    forM_,
-    fromJust,
     guardM,
-    head,
-    headMay,
-    init,
-    initMay,
-    last,
-    lastMay,
-    lazyFoldl,
     leftToMaybe,
-    liftA,
-    liftM,
     mapLeft,
     mapRight,
-    maximum,
-    maximumBy,
-    maximumByMay,
-    maximumMay,
     maybeToLeft,
     maybeToRight,
-    minimum,
-    minimumBy,
-    minimumByMay,
-    minimumMay,
     note,
     onJust,
     onJustM,
@@ -45,8 +17,6 @@ module CriterionScraper.Prelude
     onNothingM,
     onRight,
     onRightM,
-    ordNub,
-    ordNubOn,
     orM,
     print,
     product,
@@ -113,17 +83,13 @@ import Control.Exception as X (Exception (..), SomeException)
 import qualified Control.Exception
 import Control.Monad as X hiding (fail, forM, forM_, liftM)
 import qualified Control.Monad
-import Control.Monad.Error.Class as X (MonadError (..), liftEither)
 import Control.Monad.Except as X
   ( Except,
     ExceptT (..),
     MonadError (..),
-    mapExcept,
-    mapExceptT,
+    liftEither,
     runExcept,
     runExceptT,
-    withExcept,
-    withExceptT,
   )
 import qualified Control.Monad.Fail
 import Control.Monad.Fix as X (MonadFix (..))
@@ -144,6 +110,7 @@ import Control.Monad.State.Strict as X
     evalStateT,
     execState,
     execStateT,
+    get,
     gets,
     modify,
     runState,
@@ -153,7 +120,6 @@ import Control.Monad.Trans.Class as X (MonadTrans (..))
 import Control.Monad.Trans.Maybe as X (MaybeT (..))
 import Data.Aeson as X (FromJSON (..), ToJSON (..))
 import Data.Bifunctor as X (Bifunctor (..))
-import Data.Bits as X
 import Data.Bool as X hiding (bool)
 import Data.ByteString as X (ByteString)
 import qualified Data.ByteString.Lazy
@@ -181,8 +147,6 @@ import Data.Foldable as X
     concat,
     concatMap,
     find,
-    foldlM,
-    foldrM,
     for_,
     notElem,
     or,
@@ -195,7 +159,6 @@ import Data.Functor as X
 import Data.Functor.Contravariant as X (Contravariant (..))
 import Data.Functor.Identity as X (Identity (..))
 import Data.Int as X (Int, Int16, Int32, Int64, Int8)
-import Data.Kind as X (Constraint, Type)
 import Data.List as X
   ( break,
     cycle,
@@ -278,100 +241,17 @@ error = Prelude.error
 fail :: MonadFail m => Text -> m a
 fail = Control.Monad.Fail.fail . Data.Text.unpack
 
-{-# WARNING foldl "Prefer foldl' (use lazyFoldl to silence this warning)" #-}
-foldl :: Foldable t => (b -> a -> b) -> b -> t a -> b
-foldl = Prelude.foldl
-
-{-# WARNING foldr1 "Prefer foldr1May (use unsafeFoldr1 to silence this warning)" #-}
-foldr1 :: Foldable t => (a -> a -> a) -> t a -> a
-foldr1 = Data.Foldable.foldr1
-
-foldr1May :: Foldable t => (a -> a -> a) -> t a -> Maybe a
-foldr1May f xs = if null xs then Nothing else Just (Data.Foldable.foldr1 f xs)
-
-{-# DEPRECATED forM "Use for" #-}
-forM :: (Traversable t, Monad m) => t a -> (a -> m b) -> m (t b)
-forM = Data.Traversable.forM
-
-{-# DEPRECATED forM_ "Use for_" #-}
-forM_ :: (Foldable t, Monad m) => t a -> (a -> m b) -> m ()
-forM_ = Data.Foldable.forM_
-
-{-# WARNING fromJust "fromJust (use unsafeFromJust to silence this warning)" #-}
-fromJust :: Maybe a -> a
-fromJust = Data.Maybe.fromJust
-
 guardM :: MonadPlus m => m Bool -> m ()
 guardM f = guard =<< f
 
-{-# WARNING head "Prefer headMay (use unsafeHead to silence this warning)" #-}
-head :: [a] -> a
-head = Prelude.head
-
-headMay :: Foldable t => t a -> Maybe a
-headMay = foldr (\x _ -> Just x) Nothing
-
-{-# WARNING init "Prefer initMay (use unsafeInit to silence this warning)" #-}
-init :: [a] -> [a]
-init = Prelude.init
-
-initMay :: [a] -> Maybe [a]
-initMay xs = if null xs then Nothing else Just (Prelude.init xs)
-
-{-# WARNING last "Prefer lastMay (use unsafeLast to silence this warning)" #-}
-last :: [a] -> a
-last = Prelude.last
-
-lastMay :: [a] -> Maybe a
-lastMay xs = if null xs then Nothing else Just (Prelude.last xs)
-
-lazyFoldl :: Foldable t => (b -> a -> b) -> b -> t a -> b
-lazyFoldl = Prelude.foldl
-
 leftToMaybe :: Either l r -> Maybe l
 leftToMaybe = either Just (const Nothing)
-
-{-# DEPRECATED liftA "Use fmap" #-}
-liftA :: Applicative f => (a -> b) -> f a -> f b
-liftA = Control.Applicative.liftA
-
-{-# DEPRECATED liftM "Use fmap" #-}
-liftM :: Monad m => (a -> b) -> m a -> m b
-liftM = Control.Monad.liftM
 
 mapLeft :: (a -> b) -> Either a x -> Either b x
 mapLeft f = either (Left . f) Right
 
 mapRight :: (a -> b) -> Either x a -> Either x b
 mapRight = fmap
-
-{-# WARNING maximum "Prefer maximumMay (use unsafeMaximum to silence this warning)" #-}
-maximum :: (Foldable t, Ord a) => t a -> a
-maximum = Data.Foldable.maximum
-
-{-# WARNING maximumBy "Prefer maximumByMay (use unsafeMaximumBy to silence this warning)" #-}
-maximumBy :: Foldable t => (a -> a -> Ordering) -> t a -> a
-maximumBy = Data.Foldable.maximumBy
-
-maximumByMay :: Foldable t => (a -> a -> Ordering) -> t a -> Maybe a
-maximumByMay f xs = if null xs then Nothing else Just (Data.Foldable.maximumBy f xs)
-
-maximumMay :: (Foldable t, Ord a) => t a -> Maybe a
-maximumMay xs = if null xs then Nothing else Just (Data.Foldable.maximum xs)
-
-{-# WARNING minimum "Prefer minimumMay (use unsafeMinimum to silence this warning)" #-}
-minimum :: (Foldable t, Ord a) => t a -> a
-minimum = Data.Foldable.minimum
-
-{-# WARNING minimumBy "Prefer minimumByMay (use unsafeMinimumBy to silence this warning)" #-}
-minimumBy :: Foldable t => (a -> a -> Ordering) -> t a -> a
-minimumBy = Data.Foldable.maximumBy
-
-minimumMay :: (Foldable t, Ord a) => t a -> Maybe a
-minimumMay xs = if null xs then Nothing else Just (Data.Foldable.minimum xs)
-
-minimumByMay :: Foldable t => (a -> a -> Ordering) -> t a -> Maybe a
-minimumByMay f xs = if null xs then Nothing else Just (Data.Foldable.minimumBy f xs)
 
 maybeToLeft :: r -> Maybe l -> Either l r
 maybeToLeft r = maybe (Right r) Left
@@ -406,14 +286,6 @@ onRight = either pure
 
 onRightM :: Monad m => (b -> m a) -> m (Either a b) -> m a
 onRightM f x = x >>= onRight f
-
-{-# DEPRECATED ordNub "Use nubOrd" #-}
-ordNub :: Ord a => [a] -> [a]
-ordNub = nubOrd
-
-{-# DEPRECATED ordNubOn "Use nubOrdOn" #-}
-ordNubOn :: Ord b => (a -> b) -> [a] -> [a]
-ordNubOn = nubOrdOn
 
 orM :: (Foldable t, Monad m) => t (m Bool) -> m Bool
 orM =

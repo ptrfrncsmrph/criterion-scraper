@@ -50,16 +50,20 @@ newtype AppError = AppError String
 instance Exception AppError
 
 class MonadIO m => MonadDatabase m where
-  returning :: (ToRow q, FromRow r) => Connection -> Query -> [q] -> m [r]
-  returningWith :: (ToRow q) => RowParser r -> Connection -> Query -> [q] -> m [r]
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
+  query :: (ToRow q, FromRow r) => Connection -> Query -> q -> m [r]
+  query_ :: FromRow r => Connection -> Query -> m [r]
+  returning :: (ToRow q, FromRow r) => Connection -> Query -> [q] -> m [r]
+  returningWith :: ToRow q => RowParser r -> Connection -> Query -> [q] -> m [r]
 
 instance MonadDatabase AppM where
-  returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
-  returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
   execute = (fmap . fmap) liftIO . PostgreSQL.Simple.execute
   execute_ = fmap liftIO . PostgreSQL.Simple.execute_
+  query = (fmap . fmap) liftIO . PostgreSQL.Simple.query
+  query_ = fmap liftIO . PostgreSQL.Simple.query_
+  returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
+  returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
 
 instance MonadError AppError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left

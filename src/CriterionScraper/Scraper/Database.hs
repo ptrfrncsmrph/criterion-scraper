@@ -1,13 +1,15 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE QuasiQuotes #-}
 {-# LANGUAGE TypeApplications #-}
 
 module CriterionScraper.Scraper.Database
-  ( runScraper,
-    getAllMovies,
+  ( allMovies,
     createDatabase,
+    scrape,
     Movie (..),
+    Movie' (..),
   )
 where
 
@@ -37,10 +39,22 @@ data Movie = Movie
     country :: Text,
     year :: Int
   }
-  deriving (Show, Generic, FromRow)
+  deriving (Show, ToJSON, Generic, FromRow)
+
+data Movie' = Movie'
+  { movieId :: UUID,
+    created :: UTCTime,
+    modified :: UTCTime,
+    title :: Text,
+    director :: Text,
+    country :: Text,
+    year :: Int,
+    wasInserted :: Bool
+  }
+  deriving (Generic, ToJSON, Show)
 
 moviesTable :: Query
-moviesTable = "movies_2020_11_21"
+moviesTable = "movies"
 
 constraint :: Query
 constraint = moviesTable <> "_title_director_year"
@@ -79,12 +93,16 @@ insertMovie =
     SET modified = EXCLUDED.modified
     RETURNING *, (xmax = 0) AS inserted|]
 
-getAllMovies :: Query
-getAllMovies =
-  "SELECT * from " <> moviesTable
+allMovies :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m) => m [Movie]
+allMovies = do
+  putStrLn "Creating database"
+  conn <- asks connection
+  query_
+    conn
+    ("SELECT * from " <> moviesTable)
 
-runScraper :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError AppError m) => m ()
-runScraper = do
+scrape :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError AppError m) => m [Movie']
+scrape = do
   putStrLn "Creating database"
   _n <- createDatabase
   putStrLn "Scraping movies"
@@ -98,4 +116,4 @@ runScraper = do
       conn
       insertMovie
       (movies <&> \Scraper.Movie.Movie {..} -> (title, director, country, year))
-  putStrLn (show xs)
+  pure (xs <&> \(Movie {..}, Only wasInserted) -> Movie' {..})

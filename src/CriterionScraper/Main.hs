@@ -14,7 +14,7 @@ import CriterionScraper.Scraper
     AppM (..),
   )
 import qualified CriterionScraper.Scraper as Scraper
-import CriterionScraper.Scraper.Database (runScraper)
+import CriterionScraper.Scraper.Database (scrape)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 
 main :: IO ()

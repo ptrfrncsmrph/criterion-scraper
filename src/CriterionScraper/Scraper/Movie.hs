@@ -7,7 +7,6 @@ module CriterionScraper.Scraper.Movie
 where
 
 import CriterionScraper.Prelude
-import Data.Text (Text)
 import Database.PostgreSQL.Simple (FromRow, ToRow)
 
 data Movie = Movie
