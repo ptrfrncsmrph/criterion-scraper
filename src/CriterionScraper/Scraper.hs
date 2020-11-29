@@ -41,12 +41,6 @@ data AppConfig = AppConfig
 
 data AppEnvironment = Production | Development
 
--- @TODO: Use typed errors
--- newtype AppError = AppError String
---   deriving (Show)
-
--- instance Exception AppError
-
 class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
   execute_ :: Connection -> Query -> m Int64
@@ -62,19 +56,6 @@ instance MonadDatabase AppM where
   query_ = fmap liftIO . PostgreSQL.Simple.query_
   returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
   returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
-
--- class MonadHandler m where
---   fromHandler :: Handler a -> m a
-
--- @TODO - Pete Murphy 2020-11-28 - How do
--- instance MonadHandler AppM where
---   fromHandler =
---     AppM
---       . ReaderT
---       . pure
---       . ExceptT
---       . fmap (mapLeft (\(ServerError {..}) -> AppError "ServerError"))
---       . runHandler
 
 instance MonadError ServerError AppM where
   throwError = AppM . ReaderT . pure . ExceptT . pure . Left
