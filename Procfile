@@ -1,1 +1,1 @@
-web: criterion-scraper-exe
+web: criterion-scraper
