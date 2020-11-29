@@ -70,16 +70,11 @@ import Control.Applicative as X
     optional,
     (<**>),
   )
-import qualified Control.Applicative
 import Control.Arrow as X ((&&&))
 import Control.Category as X ((<<<), (>>>))
 import Control.Concurrent.MVar as X (MVar)
-import Control.Concurrent.STM as X (STM, TMVar, TVar)
-import Control.DeepSeq as X (NFData (..), deepseq, force, ($!!))
 import Control.Exception as X (Exception (..), SomeException)
-import qualified Control.Exception
 import Control.Monad as X hiding (fail, forM, forM_, liftM)
-import qualified Control.Monad
 import Control.Monad.Except as X
   ( Except,
     ExceptT (..),
@@ -119,9 +114,7 @@ import Data.Aeson as X (FromJSON (..), ToJSON (..))
 import Data.Bifunctor as X (Bifunctor (..))
 import Data.Bool as X hiding (bool)
 import Data.ByteString as X (ByteString)
-import qualified Data.ByteString.Lazy
 import Data.Char as X (Char)
-import qualified Data.Char
 import Data.Coerce as X (Coercible, coerce)
 import Data.Containers.ListUtils as X (nubOrd, nubOrdOn)
 import Data.Data as X (Data)
@@ -200,7 +193,6 @@ import qualified Data.Maybe
 import Data.Monoid as X hiding (First (..), Last (..))
 import Data.Ord as X (Ord (..), Ordering (..), comparing)
 import Data.Proxy as X (Proxy (..))
-import qualified Data.Proxy
 import Data.Semigroup as X (Semigroup (..))
 import Data.Set as X (Set)
 import Data.String as X (IsString, String)
@@ -209,7 +201,6 @@ import qualified Data.Text
 import Data.Text.Encoding as X (decodeUtf8', encodeUtf8)
 import qualified Data.Text.IO
 import Data.Traversable as X hiding (forM)
-import qualified Data.Traversable
 import Data.Tuple as X (curry, fst, snd, swap, uncurry)
 import Data.Void as X (Void, absurd, vacuous)
 import qualified Debug.Trace

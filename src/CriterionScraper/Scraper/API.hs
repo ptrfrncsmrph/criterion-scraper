@@ -9,7 +9,6 @@ import CriterionScraper.Prelude
 -- import CriterionScraper.Scraper (AppError (..))
 import CriterionScraper.Scraper.Movie (Movie (..))
 import qualified Data.Char as Char
-import Data.Text (Text)
 import qualified Data.Text as Text
 import Servant (ServerError (..), err500)
 import Text.HTML.Scalpel (Config (..), Scraper, (@:))

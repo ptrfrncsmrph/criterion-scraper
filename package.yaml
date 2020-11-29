@@ -10,11 +10,7 @@ dependencies:
   - aeson
   - bytestring
   - containers
-  - deepseq
   - dotenv
-  - lens
-  - hashable
-  - http-client
   - mtl
   - postgresql-simple
   - raw-strings-qq
@@ -22,7 +18,6 @@ dependencies:
   - scalpel
   - servant
   - servant-server
-  - stm
   - text
   - time
   - transformers
@@ -43,6 +38,10 @@ default-extensions:
   - RecordWildCards
   - ScopedTypeVariables
   - TypeOperators
+
+ghc-options:
+  - -Wall
+  - -Werror
 
 library:
   source-dirs: src

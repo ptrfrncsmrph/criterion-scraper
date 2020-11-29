@@ -13,7 +13,12 @@ import qualified CriterionScraper.Scraper as Scraper
 import CriterionScraper.Scraper.Database (allMovies, scrape)
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import qualified Network.Wai.Handler.Warp as Warp
-import Servant (Handler (..), Server, ServerT (..), (:<|>) (..))
+import Servant
+  ( Handler (..),
+    Server,
+    ServerT,
+    (:<|>) (..),
+  )
 import qualified Servant
 
 main :: IO ()

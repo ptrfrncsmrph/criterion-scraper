@@ -13,10 +13,7 @@ module CriterionScraper.Scraper
 where
 
 import CriterionScraper.Prelude
-import qualified Data.ByteString.Lazy as ByteString
 import qualified Data.List as List
-import Data.Text (Text)
-import qualified Data.Text.IO as Text.IO
 import Database.PostgreSQL.Simple
   ( ConnectInfo (..),
     Connection,
@@ -26,7 +23,7 @@ import Database.PostgreSQL.Simple
   )
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (RowParser)
-import Servant (Handler (..), ServerError (..), err500, runHandler)
+import Servant (ServerError (..), err500)
 
 newtype AppM a = AppM {runAppM :: ReaderT AppConfig (ExceptT ServerError IO) a}
   deriving
@@ -66,8 +63,8 @@ instance MonadDatabase AppM where
   returning = (fmap . fmap) liftIO . PostgreSQL.Simple.returning
   returningWith = (fmap . fmap . fmap) liftIO . PostgreSQL.Simple.returningWith
 
-class MonadHandler m where
-  fromHandler :: Handler a -> m a
+-- class MonadHandler m where
+--   fromHandler :: Handler a -> m a
 
 -- @TODO - Pete Murphy 2020-11-28 - How do
 -- instance MonadHandler AppM where

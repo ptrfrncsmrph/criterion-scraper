@@ -23,10 +23,9 @@ import qualified CriterionScraper.Scraper.Movie as Scraper.Movie
 import qualified Data.List as List
 import Data.Time.Clock (UTCTime)
 import Data.UUID (UUID)
-import Database.PostgreSQL.Simple (ConnectInfo (..), Connection, Query)
-import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
-import Database.PostgreSQL.Simple.FromRow (FromRow (..), RowParser)
-import Database.PostgreSQL.Simple.Types (Null (..), Only (..))
+import Database.PostgreSQL.Simple (Query)
+import Database.PostgreSQL.Simple.FromRow (FromRow (..))
+import Database.PostgreSQL.Simple.Types (Only (..))
 import Servant (ServerError)
 import Text.RawString.QQ (r)
 
@@ -95,7 +94,6 @@ insertMovie =
 
 allMovies :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m) => m [Movie]
 allMovies = do
-  putStrLn "Creating database"
   conn <- asks connection
   query_
     conn

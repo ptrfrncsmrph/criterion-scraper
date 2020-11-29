@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7234a555ae86b772d1a46ec73ba27422f986b9e6cbf02dbf4cd06c2ca354ed08
+-- hash: f1d01d5c1366758caeb33d27d2b9619337e68ac0ee4732353749be09554e4ed0
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -19,7 +19,6 @@ library
   exposed-modules:
       CriterionScraper.API
       CriterionScraper.Main
-      CriterionScraper.Other
       CriterionScraper.Prelude
       CriterionScraper.Scraper
       CriterionScraper.Scraper.API
@@ -30,16 +29,13 @@ library
   hs-source-dirs:
       src
   default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
+  ghc-options: -Wall -Werror
   build-depends:
       aeson
     , base >=4.7 && <5
     , bytestring
     , containers
-    , deepseq
     , dotenv
-    , hashable
-    , http-client
-    , lens
     , mtl
     , postgresql-simple
     , raw-strings-qq
@@ -47,7 +43,6 @@ library
     , scalpel
     , servant
     , servant-server
-    , stm
     , text
     , time
     , transformers
@@ -63,18 +58,14 @@ executable criterion-scraper
   hs-source-dirs:
       ./app
   default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
-  ghc-options: -threaded -O "-with-rtsopts=-N"
+  ghc-options: -Wall -Werror -threaded -O "-with-rtsopts=-N"
   build-depends:
       aeson
     , base >=4.7 && <5
     , bytestring
     , containers
     , criterion-scraper
-    , deepseq
     , dotenv
-    , hashable
-    , http-client
-    , lens
     , mtl
     , postgresql-simple
     , raw-strings-qq
@@ -82,7 +73,6 @@ executable criterion-scraper
     , scalpel
     , servant
     , servant-server
-    , stm
     , text
     , time
     , transformers
@@ -99,18 +89,14 @@ test-suite criterion-scraper-test
   hs-source-dirs:
       test
   default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
     , base >=4.7 && <5
     , bytestring
     , containers
     , criterion-scraper
-    , deepseq
     , dotenv
-    , hashable
-    , http-client
-    , lens
     , mtl
     , postgresql-simple
     , raw-strings-qq
@@ -118,7 +104,6 @@ test-suite criterion-scraper-test
     , scalpel
     , servant
     , servant-server
-    , stm
     , text
     , time
     , transformers
