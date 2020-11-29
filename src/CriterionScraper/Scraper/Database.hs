@@ -19,8 +19,6 @@ import CriterionScraper.Scraper
   )
 import qualified CriterionScraper.Scraper.API as API
 import CriterionScraper.Scraper.Movie (ScrapedMovie (..))
-import qualified CriterionScraper.Scraper.Movie as Scraper.Movie
-import qualified Data.List as List
 import Data.Time.Clock (UTCTime)
 import Data.UUID (UUID)
 import Database.PostgreSQL.Simple (Query)
@@ -113,7 +111,7 @@ scrape = do
   _n <- createTable
   putStrLn "Scraping movies"
   -- @TODO - Pete Murphy 2020-11-24 - Better way of doing this
-  (movies :: [ScrapedMovie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies
+  (movies :: [ScrapedMovie]) <- API.scrapeAllMovies
   putStrLn "Success"
   conn <- asks connection
   (xs :: [(Movie, Only Bool)]) <-
