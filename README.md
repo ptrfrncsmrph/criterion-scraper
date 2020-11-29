@@ -1,1 +1,1 @@
-# criterion-scraper
+# Criterion Scraper

@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: f1d01d5c1366758caeb33d27d2b9619337e68ac0ee4732353749be09554e4ed0
+-- hash: ec4a137f57fc6f46ace75229066061dc341c7c7f9c2140b8d52c8439e577f1b8
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -28,14 +28,13 @@ library
       Paths_criterion_scraper
   hs-source-dirs:
       src
-  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
+  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators ViewPatterns
   ghc-options: -Wall -Werror
   build-depends:
       aeson
     , base >=4.7 && <5
     , bytestring
     , containers
-    , dotenv
     , mtl
     , postgresql-simple
     , raw-strings-qq
@@ -57,7 +56,7 @@ executable criterion-scraper
       Paths_criterion_scraper
   hs-source-dirs:
       ./app
-  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
+  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators ViewPatterns
   ghc-options: -Wall -Werror -threaded -O "-with-rtsopts=-N"
   build-depends:
       aeson
@@ -88,7 +87,7 @@ test-suite criterion-scraper-test
       Paths_criterion_scraper
   hs-source-dirs:
       test
-  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators
+  default-extensions: BlockArguments DataKinds FlexibleContexts LambdaCase MultiParamTypeClasses NamedFieldPuns NoImplicitPrelude OverloadedStrings RankNTypes RecordWildCards ScopedTypeVariables TypeOperators ViewPatterns
   ghc-options: -Wall -Werror -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson

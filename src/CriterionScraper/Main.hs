@@ -1,6 +1,5 @@
 module CriterionScraper.Main (main) where
 
-import qualified Configuration.Dotenv as Dotenv
 import qualified Control.Exception as Exception
 import CriterionScraper.API (API, api)
 import CriterionScraper.Prelude
@@ -9,8 +8,9 @@ import CriterionScraper.Scraper
     AppEnvironment (..),
     AppM (..),
   )
-import qualified CriterionScraper.Scraper as Scraper
 import CriterionScraper.Scraper.Database (allMovies, scrape)
+import qualified Data.ByteString.Char8 as ByteString
+import qualified Data.Char as Char
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import qualified Network.Wai.Handler.Warp as Warp
 import Servant
@@ -20,29 +20,38 @@ import Servant
     (:<|>) (..),
   )
 import qualified Servant
+import qualified System.Environment as Environment
 
 main :: IO ()
-main =
-  runExceptT do
-    connectionInfo <-
-      liftEither . Scraper.parseEnv
-        =<< Dotenv.loadFile Dotenv.defaultConfig
-          `Dotenv.onMissingFile` throwError Servant.err500
-    liftIO do
-      Exception.bracket
-        (PostgreSQL.Simple.connect connectionInfo)
-        PostgreSQL.Simple.close
-        \connection -> runExceptT do
-          let cfg = AppConfig {connection, environment = Development}
-          runReaderT (runAppM (liftIO $ Warp.run 8080 (Servant.serve api (appToServer cfg)))) cfg
-    -- @TODO :(
-    >>= either print (either print mempty)
+main = do
+  environment <-
+    Environment.lookupEnv "ENVIRONMENT" <&> \case
+      (fmap (map Char.toLower) -> Just "production") -> Production
+      _ -> Development
+  port <-
+    Environment.lookupEnv "PORT" <&> \case
+      (fmap unsafeRead -> Just n) -> n
+      _ -> 8080
+  connectionString <-
+    (fmap ByteString.pack <$> Environment.lookupEnv "DATABASE_URL")
+      `whenNothingM` if environment == Production
+        then error "Failed to find DATABASE_URL"
+        else pure (PostgreSQL.Simple.postgreSQLConnectionString PostgreSQL.Simple.defaultConnectInfo)
 
-server :: ServerT API AppM
-server = allMovies :<|> scrape
+  _ <- Exception.bracket
+    (PostgreSQL.Simple.connectPostgreSQL connectionString)
+    PostgreSQL.Simple.close
+    \connection -> runExceptT do
+      let cfg = AppConfig {connection, environment}
+          serveApp = Warp.run port (Servant.serve api (appToServer cfg))
+      runReaderT (runAppM (liftIO serveApp)) cfg
+  pure ()
 
 appToServer :: AppConfig -> Server API
 appToServer cfg = Servant.hoistServer api (convertApp cfg) server
 
 convertApp :: AppConfig -> AppM a -> Handler a
 convertApp cfg (AppM a) = Handler (runReaderT a cfg)
+
+server :: ServerT API AppM
+server = allMovies :<|> scrape

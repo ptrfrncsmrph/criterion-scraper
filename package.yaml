@@ -38,6 +38,7 @@ default-extensions:
   - RecordWildCards
   - ScopedTypeVariables
   - TypeOperators
+  - ViewPatterns
 
 ghc-options:
   - -Wall

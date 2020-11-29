@@ -8,22 +8,19 @@ module CriterionScraper.Scraper
     AppEnvironment (..),
     AppM (..),
     MonadDatabase (..),
-    parseEnv,
   )
 where
 
 import CriterionScraper.Prelude
-import qualified Data.List as List
 import Database.PostgreSQL.Simple
-  ( ConnectInfo (..),
-    Connection,
+  ( Connection,
     FromRow,
     Query,
     ToRow,
   )
 import qualified Database.PostgreSQL.Simple as PostgreSQL.Simple
 import Database.PostgreSQL.Simple.FromRow (RowParser)
-import Servant (ServerError (..), err500)
+import Servant (ServerError (..))
 
 newtype AppM a = AppM {runAppM :: ReaderT AppConfig (ExceptT ServerError IO) a}
   deriving
@@ -39,7 +36,7 @@ data AppConfig = AppConfig
     connection :: Connection
   }
 
-data AppEnvironment = Production | Development
+data AppEnvironment = Production | Development deriving (Eq)
 
 class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
@@ -68,34 +65,3 @@ instance MonadError ServerError AppM where
                in runExceptT (f' conn)
             Right x -> pure (Right x)
         )
-
-parseEnv :: [(String, String)] -> Either ServerError ConnectInfo
-parseEnv env = do
-  connectHost <-
-    List.lookup "CONNECT_HOST" env
-      & noteAppError "Missing host"
-  connectPort <- do
-    port <-
-      List.lookup "CONNECT_PORT" env
-        & noteAppError "Missing port"
-    readMaybe port
-      & noteAppError ("Failed to parse port as Word16: " <> port)
-  connectUser <-
-    List.lookup "CONNECT_USER" env
-      & noteAppError "Missing user"
-  connectPassword <-
-    List.lookup "CONNECT_PASSWORD" env
-      & noteAppError "Missing password"
-  connectDatabase <-
-    List.lookup "CONNECT_DATABASE" env
-      & noteAppError "Missing database"
-  pure
-    ConnectInfo
-      { connectHost,
-        connectPort,
-        connectUser,
-        connectPassword,
-        connectDatabase
-      }
-  where
-    noteAppError errReasonPhrase = note (err500 {errReasonPhrase})
