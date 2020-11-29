@@ -38,6 +38,11 @@ main = do
         then error "Failed to find DATABASE_URL"
         else pure (PostgreSQL.Simple.postgreSQLConnectionString PostgreSQL.Simple.defaultConnectInfo)
 
+  -- @TODO - Pete Murphy 2020-11-29 - Temporary
+  putStrLn ("Using environment: " <> show environment)
+  putStrLn ("Using port: " <> show port)
+  putStrLn ("Using connectionString: " <> show connectionString)
+
   _ <- Exception.bracket
     (PostgreSQL.Simple.connectPostgreSQL connectionString)
     PostgreSQL.Simple.close

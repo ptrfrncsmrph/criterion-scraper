@@ -6,7 +6,6 @@
 
 module CriterionScraper.Scraper.Database
   ( allMovies,
-    createDatabase,
     scrape,
     Movie (..),
     Movie' (..),
@@ -63,13 +62,13 @@ moviesTable = "movies"
 constraint :: Query
 constraint = moviesTable <> "_title_director_year"
 
-createDatabase :: (MonadReader AppConfig m, MonadDatabase m) => m Int64
-createDatabase = do
+createTable :: (MonadReader AppConfig m, MonadDatabase m) => m Int64
+createTable = do
   conn <- asks connection
-  execute_ conn createMoviesTable
+  execute_ conn createTableQuery
 
-createMoviesTable :: Query
-createMoviesTable =
+createTableQuery :: Query
+createTableQuery =
   [r|CREATE TABLE IF NOT EXISTS |] <> moviesTable
     <> [r| 
     ( movie_id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V4(),
@@ -108,8 +107,8 @@ allMovies = do
 
 scrape :: (MonadDatabase m, MonadReader AppConfig m, MonadIO m, MonadError ServerError m) => m [Movie']
 scrape = do
-  putStrLn "Creating database"
-  _n <- createDatabase
+  putStrLn "Creating table"
+  _n <- createTable
   putStrLn "Scraping movies"
   -- @TODO - Pete Murphy 2020-11-24 - Better way of doing this
   (movies :: [ScrapedMovie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies

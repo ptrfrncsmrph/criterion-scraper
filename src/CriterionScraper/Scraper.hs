@@ -36,7 +36,7 @@ data AppConfig = AppConfig
     connection :: Connection
   }
 
-data AppEnvironment = Production | Development deriving (Eq)
+data AppEnvironment = Production | Development deriving (Show, Eq)
 
 class MonadIO m => MonadDatabase m where
   execute :: ToRow q => Connection -> Query -> q -> m Int64
