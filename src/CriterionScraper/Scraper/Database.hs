@@ -19,6 +19,7 @@ import CriterionScraper.Scraper
     MonadDatabase (..),
   )
 import qualified CriterionScraper.Scraper.API as API
+import CriterionScraper.Scraper.Movie (ScrapedMovie (..))
 import qualified CriterionScraper.Scraper.Movie as Scraper.Movie
 import qualified Data.List as List
 import Data.Time.Clock (UTCTime)
@@ -36,7 +37,9 @@ data Movie = Movie
     title :: Text,
     director :: Text,
     country :: Text,
-    year :: Int
+    year :: Int,
+    thumbnailURL :: Text,
+    detailsURL :: Text
   }
   deriving (Show, ToJSON, Generic, FromRow)
 
@@ -48,6 +51,8 @@ data Movie' = Movie'
     director :: Text,
     country :: Text,
     year :: Int,
+    thumbnailURL :: Text,
+    detailsURL :: Text,
     wasInserted :: Bool
   }
   deriving (Generic, ToJSON, Show)
@@ -74,6 +79,8 @@ createMoviesTable =
       director TEXT NOT NULL,
       country TEXT NOT NULL,
       year INT NOT NULL,
+      thumbnailURL TEXT NOT NULL,
+      detailsURL TEXT NOT NULL,
       CONSTRAINT |]
     <> constraint
     <> [r| UNIQUE (title, director, year)
@@ -83,8 +90,8 @@ createMoviesTable =
 insertMovie :: Query
 insertMovie =
   [r|INSERT INTO |] <> moviesTable
-    <> [r| (title, director, country, year)
-    VALUES (?, ?, ?, ?)
+    <> [r| (title, director, country, year, thumbnailURL, detailsURL)
+    VALUES (?, ?, ?, ?, ?, ?)
     ON CONFLICT ON CONSTRAINT |]
     <> constraint
     <> [r|
@@ -105,7 +112,7 @@ scrape = do
   _n <- createDatabase
   putStrLn "Scraping movies"
   -- @TODO - Pete Murphy 2020-11-24 - Better way of doing this
-  (movies :: [Scraper.Movie.Movie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies
+  (movies :: [ScrapedMovie]) <- List.sortOn Scraper.Movie.year <$> API.scrapeAllMovies
   putStrLn "Success"
   conn <- asks connection
   (xs :: [(Movie, Only Bool)]) <-
@@ -113,5 +120,5 @@ scrape = do
       ((,) <$> fromRow @Movie <*> fromRow @(Only Bool))
       conn
       insertMovie
-      (movies <&> \Scraper.Movie.Movie {..} -> (title, director, country, year))
+      (movies <&> \ScrapedMovie {..} -> (title, director, country, year, thumbnailURL, detailsURL))
   pure (xs <&> \(Movie {..}, Only wasInserted) -> Movie' {..})

@@ -2,17 +2,20 @@
 {-# LANGUAGE DeriveGeneric #-}
 
 module CriterionScraper.Scraper.Movie
-  ( Movie (..),
+  ( ScrapedMovie (..),
   )
 where
 
 import CriterionScraper.Prelude
 import Database.PostgreSQL.Simple (FromRow, ToRow)
 
-data Movie = Movie
+-- | The scraped movie
+data ScrapedMovie = ScrapedMovie
   { title :: Text,
     director :: Text,
     country :: Text,
-    year :: Int
+    year :: Int,
+    thumbnailURL :: Text,
+    detailsURL :: Text
   }
   deriving (Show, Generic, ToRow, FromRow)
