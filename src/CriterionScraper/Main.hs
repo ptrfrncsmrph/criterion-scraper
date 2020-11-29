@@ -21,9 +21,11 @@ import Servant
   )
 import qualified Servant
 import qualified System.Environment as Environment
+import System.IO (BufferMode (..), hSetBuffering, stdout)
 
 main :: IO ()
 main = do
+  hSetBuffering stdout LineBuffering
   environment <-
     Environment.lookupEnv "ENVIRONMENT" <&> \case
       (fmap (map Char.toLower) -> Just "production") -> Production
