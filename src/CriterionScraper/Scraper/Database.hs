@@ -69,7 +69,9 @@ createTable = do
 
 createTableQuery :: Query
 createTableQuery =
-  [r|CREATE TABLE IF NOT EXISTS |] <> moviesTable
+  [r|CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+    CREATE TABLE IF NOT EXISTS |]
+    <> moviesTable
     <> [r| 
     ( movie_id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V4(),
       created TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
