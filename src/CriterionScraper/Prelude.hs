@@ -25,9 +25,6 @@ module CriterionScraper.Prelude
     rightToMaybe,
     show,
     sum,
-    tail,
-    tailMay,
-    tailSafe,
     trace,
     traceEvent,
     traceEventIO,
@@ -318,18 +315,6 @@ show = Data.Text.pack . Prelude.show
 {-# INLINE sum #-}
 sum :: (Foldable f, Num a) => f a -> a
 sum = foldl' (+) 0
-
-{-# WARNING tail "Prefer tailSafe or tailMay (use unsafeTail to silence this warning)" #-}
-tail :: [a] -> [a]
-tail = Prelude.tail
-
-tailMay :: [a] -> Maybe [a]
-tailMay [] = Nothing
-tailMay (_ : xs) = Just xs
-
-tailSafe :: [a] -> [a]
-tailSafe [] = []
-tailSafe (_ : xs) = xs
 
 {-# WARNING trace "trace" #-}
 trace :: Text -> a -> a

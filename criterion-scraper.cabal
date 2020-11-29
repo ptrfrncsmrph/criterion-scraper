@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5a4109ee1b82e51c87517c96ac0a365f078636c60e7b865d6af9fb9111741d51
+-- hash: 7234a555ae86b772d1a46ec73ba27422f986b9e6cbf02dbf4cd06c2ca354ed08
 
 name:           criterion-scraper
 version:        0.1.0.0
@@ -19,6 +19,7 @@ library
   exposed-modules:
       CriterionScraper.API
       CriterionScraper.Main
+      CriterionScraper.Other
       CriterionScraper.Prelude
       CriterionScraper.Scraper
       CriterionScraper.Scraper.API
